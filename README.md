@@ -54,3 +54,30 @@ The server should now be running and you can hit the "Hello World" endpoint: htt
 
 To get VSCode to pick up intellisense in python files, open the Command Palette (Ctrl + Shift + P), select "Python: Select Interpreter", and pick the "python-flask-template" mamba environment.
 
+[//]: # (.pinkyring=DOCKER)
+
+## Docker
+
+[^1]
+
+Build the docker image:
+
+```
+docker build -t python-flask-template:latest .
+```
+
+Run the docker image:
+
+```
+docker run -e PORT=5000 -p 5000:5000 --name python-flask-template -d python-flask-template
+```
+
+Stop and remove the container:
+
+```
+docker stop python-flask-template && docker rm python-flask-template
+```
+
+[//]: # (.pinkyring=DOCKER.end)
+
+[^1]: This functionality is removable with [pinkyring](https://www.npmjs.com/package/pinkyring)

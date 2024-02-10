@@ -1,0 +1,11 @@
+{
+  "templateName": "python-flask-template",
+  "pinkyringVersion": "1.0.0",
+  "removableOptions": [
+    {
+      "label": "DOCKER",
+      "globPatterns": [".dockerignore", "Dockerfile"],
+      "contentPattern": ".pinkyring=DOCKER"
+    }
+  ]
+}
