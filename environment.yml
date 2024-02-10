@@ -1,0 +1,5 @@
+name: python-flask-template
+channels:
+  - conda-forge
+dependencies:
+  - flask
