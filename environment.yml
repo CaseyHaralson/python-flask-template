@@ -6,3 +6,5 @@ dependencies:
   - pymongo
   - ca-certificates
   - openssl
+  - marshmallow
+  - certifi

@@ -42,10 +42,10 @@ mamba env export --from-history | grep -v '^prefix: ' > environment.yml
 
 [Flask](https://flask.palletsprojects.com/en/3.0.x/) is used as the api server.
 
-Start the server:
+Start the server locally with live code reload:
 
 ```
-flask run
+flask --debug run
 ```
 
 The server should now be running and you can hit the "Hello World" endpoint: http://127.0.0.1:5000/api/hello
@@ -113,6 +113,7 @@ MONGO_USER      = mongo
 MONGO_PASSWORD  = mongo
 MONGO_HOST      = localhost
 MONGO_PORT      = 27017
+MONGO_DB        = db
 ```
 
 To connect to the database and start using Mongo:
