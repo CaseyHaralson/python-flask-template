@@ -38,7 +38,7 @@ Export the new packages to the environment file:
 mamba env export --from-history | grep -v '^prefix: ' > environment.yml
 ```
 
-## Running the Server
+## Running the Server Locally
 
 [Flask](https://flask.palletsprojects.com/en/3.0.x/) is used as the api server.
 
@@ -79,5 +79,54 @@ docker stop python-flask-template && docker rm python-flask-template
 ```
 
 [//]: # (.pinkyring=DOCKER.end)
+
+## Infrastructure
+
+A [docker-compose.infra.yml](./devops/docker-compose.infra.yml) file has been added that can be used to add any docker services (databases, caches, etc) that are needed during development.
+
+Start the infrastructure:
+
+```
+docker compose -f ./devops/docker-compose.infra.yml -p python-flask-template up -d
+```
+
+Stop the infrastructure:
+
+```
+docker compose -f ./devops/docker-compose.infra.yml -p python-flask-template down
+```
+
+[//]: # (.pinkyring=MONGO)
+
+### Document DB
+
+[^1]
+
+Mongo has been added as the document database.
+[mongo-express](https://github.com/mongo-express/mongo-express) has also been added that runs with the infrastructure (user: admin, password: pass).
+
+The configuration for the database is done in the [config.py file](./app/infrastructure/document_db/config.py).
+The following environment variable configurations can be set (or these defaults can be used during development):
+
+```
+MONGO_USER      = mongo
+MONGO_PASSWORD  = mongo
+MONGO_HOST      = localhost
+MONGO_PORT      = 27017
+```
+
+To connect to the database and start using Mongo:
+
+```
+import {DocumentClient, waitForDocumentDatabaseConnection} from './documentDB/documentClient';
+
+// wait for the database connection to be ready
+await waitForDocumentDatabaseConnection();
+
+// start using the connection
+await DocumentClient.db('db').collection('test').insertOne({hello: 'world'});
+```
+
+[//]: # (.pinkyring=MONGO.end)
 
 [^1]: This functionality is removable with [pinkyring](https://www.npmjs.com/package/pinkyring)

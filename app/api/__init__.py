@@ -5,3 +5,5 @@ api = Blueprint('api', __name__, url_prefix='/api')
 # register apis here
 from app.api.hello import hello
 api.register_blueprint(hello)
+from app.api.document import document
+api.register_blueprint(document)
