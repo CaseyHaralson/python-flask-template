@@ -3,3 +3,6 @@ channels:
   - conda-forge
 dependencies:
   - flask
+  - pymongo
+  - ca-certificates
+  - openssl
