@@ -1,7 +1,9 @@
-# the blueprint is registered in the app/api/__init__.py file
 from flask import Blueprint
-hello = Blueprint('hello', __name__, url_prefix='/hello')
 
-@hello.route('/')
+# the blueprint is registered in the app/api/__init__.py file
+hello = Blueprint("hello", __name__, url_prefix="/hello")
+
+
+@hello.route("/")
 def index():
-    return 'Hello, World!'
+    return "Hello, World!"

@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 class DocumentSchema(Schema):
     _id = fields.Str()
     title = fields.Str(required=True)
