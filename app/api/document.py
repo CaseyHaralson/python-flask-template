@@ -1,7 +1,7 @@
 from bson import ObjectId
 from marshmallow import ValidationError
 from pymongo import ReturnDocument
-from app.models.document import DocumentSchema
+from app.models.document import DocumentSchema, FigureSchema
 import datetime
 from flask import Blueprint, request
 from app.infrastructure.document_db import document_db
@@ -10,21 +10,6 @@ from app.infrastructure.document_db import document_db
 document = Blueprint("document", __name__, url_prefix="/document")
 
 _COLLECTION = "document"
-
-
-@document.route("/test")
-def test():
-    doc = {
-        # 'id': '1',
-        "title": "My first document",
-        "content": "This is the content of my first document",
-        # 'created_at': datetime.datetime(2020, 1, 1, 0, 0, 0),
-        # 'updated_at': datetime.datetime.now()
-    }
-    # result = DocumentSchema().dump(doc)
-    # result = DocumentSchema(only=('title', 'content')).dump(doc)
-    result = DocumentSchema().load(doc)
-    return result
 
 
 @document.get("/")
@@ -36,6 +21,8 @@ def get_all():
 @document.get("/<id>")
 def get(id):
     doc = document_db[_COLLECTION].find_one({"_id": ObjectId(id)})
+    if doc is None:
+        return {"message": "Document not found"}, 404
     return DocumentSchema().dump(doc)
 
 
@@ -48,7 +35,8 @@ def create():
         doc["created_at"] = datetime.datetime.utcnow()
         doc["updated_at"] = datetime.datetime.utcnow()
         result = document_db[_COLLECTION].insert_one(doc)
-        return str(result.inserted_id), 201
+        created_doc = document_db[_COLLECTION].find_one({"_id": result.inserted_id})
+        return DocumentSchema().dump(created_doc), 201
     except ValidationError as err:
         return err.messages, 400
 
@@ -57,12 +45,51 @@ def create():
 def update(id):
     data = request.json
     try:
-        doc = DocumentSchema().load(data, partial=True)
+        # using partial=True allows for partial creation of sub-schemas (it worked great til a sub-schema was added to the DocumentSchema)
+        # this means that required fields on the sub-schema are not required when adding new figures...
+        # so we use partial=("title", "content", "authors", "figures") to specify what can be partial
+        # and figures is now not required, but if it is provided, the figures schema will be fully required...
+        # a new endpoint will need to be added to handle partial updates of sub-schemas...
+        # doc = DocumentSchema().load(data, partial=True)
+        doc = DocumentSchema().load(
+            data, partial=("title", "content", "authors", "figures")
+        )
         doc.pop("_id", None)
         doc["updated_at"] = datetime.datetime.utcnow()
         result = document_db[_COLLECTION].find_one_and_update(
             {"_id": ObjectId(id)}, {"$set": doc}, return_document=ReturnDocument.AFTER
         )
-        return DocumentSchema().dump(result), 201
+        if result is None:
+            return {"message": "Document not found"}, 404
+        return DocumentSchema().dump(result), 200
     except ValidationError as err:
         return err.messages, 400
+
+
+# this doesn't allow for partial edits of a figure
+# but it does allow for a particular figure from the document to be updated...
+@document.put("/<id>/figure")
+def update_figure(id):
+    data = request.json
+    try:
+        figure = FigureSchema().load(data)
+        figure_id = figure["id"]
+        updated_at = datetime.datetime.utcnow()
+        result = document_db[_COLLECTION].find_one_and_update(
+            {"_id": ObjectId(id), "figures.id": figure_id},
+            {"$set": {"updated_at": updated_at, "figures.$": figure}},
+            return_document=ReturnDocument.AFTER,
+        )
+        if result is None:
+            return {"message": "Document or figure not found"}, 404
+        return DocumentSchema().dump(result), 200
+    except ValidationError as err:
+        return err.messages, 400
+
+
+@document.delete("/<id>")
+def delete(id):
+    result = document_db[_COLLECTION].delete_one({"_id": ObjectId(id)})
+    if result.deleted_count == 0:
+        return {"message": "Document not found"}, 404
+    return "", 204

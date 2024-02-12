@@ -102,7 +102,7 @@ docker compose -f ./devops/docker-compose.infra.yml -p python-flask-template dow
 
 [^1]
 
-Mongo has been added as the document database.
+Mongo has been added as the document database, and [pymongo](https://pymongo.readthedocs.io/en/stable/) has been added as the connector to Mongo.
 [mongo-express](https://github.com/mongo-express/mongo-express) has also been added that runs with the infrastructure (user: admin, password: pass).
 
 The configuration for the database is done in the [config.py file](./app/infrastructure/document_db/config.py).
@@ -119,14 +119,15 @@ MONGO_DB        = db
 To connect to the database and start using Mongo:
 
 ```
-import {DocumentClient, waitForDocumentDatabaseConnection} from './documentDB/documentClient';
+from app.infrastructure.document_db import document_db
 
-// wait for the database connection to be ready
-await waitForDocumentDatabaseConnection();
+_COLLECTION = "test"
 
 // start using the connection
-await DocumentClient.db('db').collection('test').insertOne({hello: 'world'});
+items = document_db[_COLLECTION].find()
 ```
+
+Several example apis handling document listing, selection by id, creation, update, and deletion have been added in the [document api file.](./app/api/document.py)
 
 [//]: # (.pinkyring=MONGO.end)
 
