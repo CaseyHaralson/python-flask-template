@@ -38,6 +38,12 @@ Export the new packages to the environment file:
 mamba env export --from-history | grep -v '^prefix: ' > environment.yml
 ```
 
+Update the environment based on an environment file updated by someone else:
+
+```
+mamba env update --prune -f environment.yml
+```
+
 ## Running the Server Locally
 
 [Flask](https://flask.palletsprojects.com/en/3.0.x/) is used as the api server.
@@ -59,6 +65,8 @@ To get VSCode to pick up intellisense in python files, open the Command Palette 
 ## Docker
 
 [^1]
+
+A [dockerfile](./Dockerfile) has been added that can be used to run the project with [Gunicorn](https://gunicorn.org/) in a container.
 
 Build the docker image:
 

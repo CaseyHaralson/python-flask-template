@@ -6,6 +6,16 @@
       "label": "DOCKER",
       "globPatterns": [".dockerignore", "Dockerfile"],
       "contentPattern": ".pinkyring=DOCKER"
+    },
+    {
+      "label": "MONGO",
+      "globPatterns": [
+        "app/api/document.py",
+        "app/infrastructure/document_db",
+        "app/models/document.py"
+      ],
+      "contentPattern": ".pinkyring=MONGO",
+      "packageNames": ["pymongo"]
     }
   ]
 }
